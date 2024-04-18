@@ -2,17 +2,20 @@ package com.sumup.sdksampleapp;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import com.sumup.merchant.reader.models.TransactionInfo;
-import com.sumup.merchant.reader.api.SumUpAPI;
-import com.sumup.merchant.reader.api.SumUpLogin;
-import com.sumup.merchant.reader.api.SumUpPayment;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+
+import com.sumup.merchant.reader.api.SumUpAPI;
+import com.sumup.merchant.reader.api.SumUpLogin;
+import com.sumup.merchant.reader.api.SumUpPayment;
+import com.sumup.merchant.reader.models.TransactionInfo;
 
 public class MainActivity extends Activity {
 
@@ -32,6 +35,9 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         findViews();
+
+        // Deep Link Handling
+        handleDeepLink(getIntent());
 
         Button login = (Button) findViewById(R.id.button_login);
         login.setOnClickListener(new View.OnClickListener() {
@@ -107,6 +113,37 @@ public class MainActivity extends Activity {
             }
         });
     }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleDeepLink(intent);
+    }
+
+    private void handleDeepLink(Intent intent) {
+        if (intent != null && Intent.ACTION_VIEW.equals(intent.getAction())) {
+            Uri data = intent.getData();
+            if (data != null) {
+                // Anzeigen von "Warte auf Zahlung"
+                mResultMessage.setText("Warte auf Zahlung...");
+
+                // Handler zur Verzögerung und Weiterleitung zum Browser
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Umleitung zur Webseite nach Verzögerung
+                        Intent webIntent = new Intent(Intent.ACTION_SENDTO, data);
+                        startActivity(webIntent);
+                        //finish(); // MainActivity beenden, nachdem der Browser geöffnet wurde
+                    }
+                }, 3000); // Verzögerung in Millisekunden (hier: 3 Sekunden)
+            }
+        }
+    }
+
+
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
