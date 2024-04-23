@@ -125,16 +125,17 @@ public class MainActivity extends Activity {
             Uri data = intent.getData();
             if (data != null) {
                 // Anzeigen von "Warte auf Zahlung"
-                mResultMessage.setText("Warte auf Zahlung...");
+                String amount = data.getQueryParameter("amount");
+                String msg = "Warte auf Zahlung von "+amount+"...";
+                mResultMessage.setText(msg);
 
                 // Handler zur Verzögerung und Weiterleitung zum Browser
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        // Umleitung zur Webseite nach Verzögerung
-                        Intent webIntent = new Intent(Intent.ACTION_SENDTO, data);
+                        String url = "https://www.deine-webseite.com";
+                        Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                         startActivity(webIntent);
-                        //finish(); // MainActivity beenden, nachdem der Browser geöffnet wurde
                     }
                 }, 3000); // Verzögerung in Millisekunden (hier: 3 Sekunden)
             }
