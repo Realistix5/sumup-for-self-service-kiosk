@@ -1,10 +1,9 @@
-package com.sumup.sdksampleapp;
+package de.chrtra.sumup_self_service_kiosk;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -44,7 +43,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 // Please go to https://me.sumup.com/developers to get your Affiliate Key by entering the application ID of your app. (e.g. com.sumup.sdksampleapp)
-                SumUpLogin sumupLogin = SumUpLogin.builder("7ca84f17-84a5-4140-8df6-6ebeed8540fc").build();
+                SumUpLogin sumupLogin = SumUpLogin.builder("sup_afk_CEmmyW58Brq8BOivwmxvnWO52jje9WpO").build();
                 SumUpAPI.openLoginActivity(MainActivity.this, sumupLogin, REQUEST_CODE_LOGIN);
             }
         });
@@ -126,18 +125,33 @@ public class MainActivity extends Activity {
             if (data != null) {
                 // Anzeigen von "Warte auf Zahlung"
                 String amount = data.getQueryParameter("amount");
-                String msg = "Warte auf Zahlung von "+amount+"...";
-                mResultMessage.setText(msg);
 
-                // Handler zur Verzögerung und Weiterleitung zum Browser
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        String url = "https://www.deine-webseite.com";
-                        Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                        startActivity(webIntent);
-                    }
-                }, 3000); // Verzögerung in Millisekunden (hier: 3 Sekunden)
+
+                SumUpPayment payment = SumUpPayment.builder()
+                        // mandatory parameters
+                        .total(new BigDecimal(amount)) // minimum 1.00
+                        .currency(SumUpPayment.Currency.EUR)
+                        // optional: to be used only if the card reader supports the feature, what can be checked with `SumUpApi.isTipOnCardReaderAvailable()`
+                        //.tipOnCardReader()
+                        // optional: include a tip amount in addition to the total, ignored if `tipOnCardReader()` is present
+                        //.tip(new BigDecimal("0.10"))
+                        // optional: add details
+                        .title("Zahlung an den GSV Gundernhausen e.V.")
+                        //.receiptEmail("customer@mail.com")
+                        //.receiptSMS("+3531234567890")
+                        // optional: Add metadata
+                        //.addAdditionalInfo("AccountId", "taxi0334")
+                        //.addAdditionalInfo("From", "Paris")
+                        //.addAdditionalInfo("To", "Berlin")
+                        // optional: foreign transaction ID, must be unique!
+                        //.foreignTransactionId(UUID.randomUUID().toString())  // can not exceed 128 chars
+                        // optional: skip the success screen
+                        .skipSuccessScreen()
+                        // optional: skip the failed screen
+                        .skipFailedScreen()
+                        .build();
+
+                SumUpAPI.checkout(MainActivity.this, payment, 2);
             }
         }
     }
@@ -171,6 +185,23 @@ public class MainActivity extends Activity {
 
                     TransactionInfo transactionInfo = extra.getParcelable(SumUpAPI.Response.TX_INFO);
                     mTxInfo.setText(transactionInfo == null ? "" : "Transaction Info : " + transactionInfo);
+
+                    String url = "";
+                    if (transactionInfo.mStatus.toString().equals("SUCCESSFUL")) {
+                        // if transaction successful, redirect to webpage
+                        url = "http://192.168.178.79:8000/?transaction_code="+transactionInfo.mTransactionCode.toString();
+                    } else {
+                        url = "http://192.168.178.79:8000/?transaction_code=failed";
+                    }
+
+                    // Erzeuge ein Intent mit der Aktion ACTION_VIEW
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+
+                    // Setze die Daten des Intents auf die URL
+                    intent.setData(Uri.parse(url));
+
+                    // Starte die Aktivität
+                    startActivity(intent);
                 }
                 break;
 
