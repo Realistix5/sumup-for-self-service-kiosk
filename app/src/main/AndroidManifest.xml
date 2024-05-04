@@ -7,12 +7,13 @@
       android:icon="@drawable/icon"
       android:label="@string/app_name"
       android:name=".SampleApplication"
-      android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
+      android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
+      android:usesCleartextTraffic="true">
 
-    <activity
-      android:name="de.chrtra.sumup_self_service_kiosk.MainActivity"
-      android:label="@string/app_name"
-      android:exported="true">
+        <activity
+          android:name="de.chrtra.sumup_self_service_kiosk.MainActivity"
+          android:label="@string/app_name"
+          android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -22,6 +23,23 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="pay" android:host="sumup" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".PaymentActivity"
+            android:exported="true">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="pay" android:host="sumup" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".WebViewActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>

@@ -56,7 +56,16 @@
       android:text="Log out"
       android:layout_gravity="center"/>
 
-  <ScrollView
+    <!-- activity_main.xml -->
+    <Button
+        android:id="@+id/btn_open_webview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Open WebView Activity"
+        android:onClick="openWebViewActivity" />
+
+
+    <ScrollView
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 

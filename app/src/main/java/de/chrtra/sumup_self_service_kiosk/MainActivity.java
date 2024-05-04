@@ -233,4 +233,9 @@ public class MainActivity extends Activity {
         mReceiptSent = (TextView) findViewById(R.id.receipt_sent);
         mTxInfo = (TextView) findViewById(R.id.tx_info);
     }
+
+    public void openWebViewActivity(View view) {
+        Intent intent = new Intent(this, WebViewActivity.class);
+        startActivity(intent);
+    }
 }
