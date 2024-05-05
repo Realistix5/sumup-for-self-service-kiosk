@@ -7,7 +7,7 @@ import android.os.Bundle;
 import java.math.BigDecimal;
 import com.sumup.merchant.reader.api.SumUpAPI;
 import com.sumup.merchant.reader.api.SumUpPayment;
-
+import com.sumup.merchant.reader.models.TransactionInfo;
 
 
 public class PaymentActivity extends Activity {
@@ -32,6 +32,40 @@ public class PaymentActivity extends Activity {
         }
     }
 
-    // Add handling of result
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
+        if (requestCode == 2 && data != null) {
+            Intent intent = new Intent(this, WebViewActivity.class);
+
+            switch (resultCode) {
+                case 1:
+                    // Success
+                    Bundle extra = data.getExtras();
+                    TransactionInfo transactionInfo = extra.getParcelable(SumUpAPI.Response.TX_INFO);
+                    String transactionCode = transactionInfo.mTransactionCode.toString();
+                    intent.putExtra("url", "http://192.168.178.79:8000/process_payment/" + transactionCode);
+                    break;
+
+                case 2:
+                    // Failed
+                    intent.putExtra("url", "http://192.168.178.79:8000/payment_failed/");
+                    break;
+
+                case 8:
+                    // Not logged in
+                    intent.putExtra("url", "http://192.168.178.79:8000/payment_problem/");
+                    break;
+
+                default:
+                    intent.putExtra("url", "http://192.168.178.79:8000/payment_problem/"+resultCode);
+                    break;
+
+            }
+
+            startActivity(intent);
+        }
+
+    }
 }
+

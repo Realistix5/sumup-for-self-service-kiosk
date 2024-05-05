@@ -39,6 +39,14 @@ public class WebViewActivity extends Activity {
                 }
             }
         });
+
+        Intent intent = getIntent();
+        String url = intent.getStringExtra("url");
+        if (url != null && !url.isEmpty()) {
+            webView.loadUrl(url);
+        } else {
+            webView.loadUrl("http://192.168.178.79:8000/");  // Standard URL laden, falls keine URL übermittelt wurde
+        }
     }
 }
 
