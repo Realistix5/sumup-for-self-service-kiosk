@@ -37,14 +37,14 @@ public class PaymentActivity extends Activity {
 
         if (requestCode == 2 && data != null) {
             Intent intent = new Intent(this, WebViewActivity.class);
+            Bundle extra = data.getExtras();
 
             switch (resultCode) {
                 case 1:
                     // Success
-                    Bundle extra = data.getExtras();
                     TransactionInfo transactionInfo = extra.getParcelable(SumUpAPI.Response.TX_INFO);
                     String transactionCode = transactionInfo.mTransactionCode.toString();
-                    intent.putExtra("url", "http://192.168.178.79:8000/process_payment/" + transactionCode);
+                    intent.putExtra("url", "http://192.168.178.79:8000/confirm_order?paid=" + transactionCode);
                     break;
 
                 case 2:
@@ -52,13 +52,8 @@ public class PaymentActivity extends Activity {
                     intent.putExtra("url", "http://192.168.178.79:8000/payment_failed/");
                     break;
 
-                case 8:
-                    // Not logged in
-                    intent.putExtra("url", "http://192.168.178.79:8000/payment_problem/");
-                    break;
-
                 default:
-                    intent.putExtra("url", "http://192.168.178.79:8000/payment_problem/"+resultCode);
+                    intent.putExtra("url", "http://192.168.178.79:8000/payment_problem?code="+resultCode);
                     break;
 
             }
