@@ -44,16 +44,16 @@ public class PaymentActivity extends Activity {
                     // Success
                     TransactionInfo transactionInfo = extra.getParcelable(SumUpAPI.Response.TX_INFO);
                     String transactionCode = transactionInfo.mTransactionCode.toString();
-                    intent.putExtra("url", "http://192.168.178.79:8000/confirm_order?paid=" + transactionCode);
+                    intent.putExtra("url", "https://192.168.178.79:8000/confirm_order?paid=" + transactionCode);
                     break;
 
                 case 2:
                     // Failed
-                    intent.putExtra("url", "http://192.168.178.79:8000/payment_failed/");
+                    intent.putExtra("url", "https://192.168.178.79:8000/payment_failed/");
                     break;
 
                 default:
-                    intent.putExtra("url", "http://192.168.178.79:8000/payment_problem?code="+resultCode);
+                    intent.putExtra("url", "https://192.168.178.79:8000/payment_problem?code="+resultCode);
                     break;
 
             }

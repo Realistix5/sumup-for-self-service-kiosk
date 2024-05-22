@@ -189,9 +189,9 @@ public class MainActivity extends Activity {
                     String url = "";
                     if (transactionInfo.mStatus.toString().equals("SUCCESSFUL")) {
                         // if transaction successful, redirect to webpage
-                        url = "http://192.168.178.79:8000/?transaction_code="+transactionInfo.mTransactionCode.toString();
+                        url = "https://192.168.178.79:8000/?transaction_code="+transactionInfo.mTransactionCode.toString();
                     } else {
-                        url = "http://192.168.178.79:8000/?transaction_code=failed";
+                        url = "https://192.168.178.79:8000/?transaction_code=failed";
                     }
 
                     // Erzeuge ein Intent mit der Aktion ACTION_VIEW
