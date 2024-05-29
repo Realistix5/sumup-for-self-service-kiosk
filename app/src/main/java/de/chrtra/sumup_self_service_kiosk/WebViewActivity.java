@@ -1,10 +1,8 @@
 package de.chrtra.sumup_self_service_kiosk;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Build;
@@ -13,6 +11,7 @@ import android.webkit.PermissionRequest;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -20,9 +19,15 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.sumup.merchant.reader.api.SumUpAPI;
+import com.sumup.merchant.reader.models.TransactionInfo;
+
+import java.util.ArrayList;
+
 public class WebViewActivity extends Activity {
 
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
+    private static final int PAYMENT_REQUEST_CODE = 2; // Request-Code für die PaymentActivity
     private WebView webView;
 
     @Override
@@ -35,20 +40,24 @@ public class WebViewActivity extends Activity {
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setMediaPlaybackRequiresUserGesture(false); // Ermöglicht automatische Medienwiedergabe
+        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
         webView.setWebViewClient(new WebViewClient() {
+            // Start intent for custom url scheme
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
                 if (uri.toString().startsWith("pay://sumup")) {
                     Intent intent = new Intent(view.getContext(), PaymentActivity.class);
                     intent.setData(uri);
-                    view.getContext().startActivity(intent);
+                    startActivityForResult(intent, PAYMENT_REQUEST_CODE);
                     return true;
                 } else {
                     return false;
                 }
             }
+
+            // Get Dialogue on received SSL error
             @Override
             public void onReceivedSslError(WebView view, final SslErrorHandler handler, SslError error) {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(WebViewActivity.this);
@@ -76,8 +85,22 @@ public class WebViewActivity extends Activity {
                 final AlertDialog dialog = builder.create();
                 dialog.show();
             }
+
+            // Don't request favicon.ico
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                if (!request.isForMainFrame() && request.getUrl().getPath().contains("/favicon.ico")) {
+                    try {
+                        return new WebResourceResponse("image/png", null, null);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                return null;
+            }
         });
 
+        // Automatically grant permission requests
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onPermissionRequest(final PermissionRequest request) {
@@ -87,16 +110,10 @@ public class WebViewActivity extends Activity {
             }
         });
 
-        // Überprüfe und fordere Kamera-Berechtigungen an
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
-        } else {
-            // Wenn die Berechtigung bereits erteilt wurde, lade die URL
-            loadWebView();
-        }
+        loadWebView();
     }
 
+    // Load page from intent or default url
     private void loadWebView() {
         Intent intent = getIntent();
         String url = intent.getStringExtra("url");
@@ -108,18 +125,48 @@ public class WebViewActivity extends Activity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Berechtigung erteilt, lade die WebView neu
-                loadWebView();
-            } else {
-                // Berechtigung verweigert
-                new AlertDialog.Builder(this)
-                        .setMessage("Die Kamera-Berechtigung wird benötigt, um die QR-Code-Scanner-Funktion zu verwenden.")
-                        .setPositiveButton("OK", (dialog, which) -> finish())
-                        .show();
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PAYMENT_REQUEST_CODE && data != null) {
+            Uri.Builder uriBuilder;
+            String url;
+
+            switch (resultCode) {
+                case 1:
+                    // Success
+                    String transactionInfo = data.getStringExtra("paid");
+
+                    uriBuilder = Uri.parse("https://192.168.178.79:8000/process_payment/")
+                            .buildUpon()
+                            .appendQueryParameter("paid", transactionInfo);
+                    break;
+
+                case 2:
+                    // Failed
+                    uriBuilder = Uri.parse("https://192.168.178.79:8000/payment_failed/").buildUpon();
+                    break;
+
+                default:
+                    uriBuilder = Uri.parse("https://192.168.178.79:8000/payment_problem/")
+                            .buildUpon()
+                            .appendQueryParameter("code", String.valueOf(resultCode));
+                    break;
             }
+
+            // Füge die gespeicherten Query-Parameter hinzu
+            ArrayList<String> params = data.getStringArrayListExtra("params");
+            if (params != null) {
+                for (String parameter : params) {
+                    String value = data.getStringExtra(parameter);
+                    if (!"amount".equals(parameter)) { // "amount" Parameter nicht hinzufügen
+                        uriBuilder.appendQueryParameter(parameter, value);
+                    }
+                }
+            }
+
+            Uri finalUri = uriBuilder.build();
+            webView.loadUrl(finalUri.toString());
         }
     }
 }
