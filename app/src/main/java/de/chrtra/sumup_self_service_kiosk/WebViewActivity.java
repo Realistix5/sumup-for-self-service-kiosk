@@ -37,6 +37,8 @@ public class WebViewActivity extends Activity {
 
         webView = findViewById(R.id.webview);
 
+        startLockTask();
+
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setMediaPlaybackRequiresUserGesture(false); // Ermöglicht automatische Medienwiedergabe
