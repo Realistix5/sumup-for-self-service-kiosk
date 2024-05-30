@@ -10,12 +10,12 @@ android {
         versionCode 1
         versionName "4.3.0"
     }
-
     packagingOptions {
-        exclude 'META-INF/services/javax.annotation.processing.Processor'
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/NOTICE'
+        resources {
+            excludes += ['META-INF/services/javax.annotation.processing.Processor', 'META-INF/LICENSE', 'META-INF/NOTICE']
+        }
     }
+
 
     compileOptions {
         coreLibraryDesugaringEnabled true
@@ -30,6 +30,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt')
         }
     }
+    namespace 'de.chrtra.sumup_self_service_kiosk'
 }
 
 dependencies {

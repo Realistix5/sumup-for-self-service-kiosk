@@ -2,11 +2,13 @@ package de.chrtra.sumup_self_service_kiosk;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.InputType;
 import android.webkit.PermissionRequest;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
@@ -15,6 +17,15 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.text.InputType;
+import android.widget.EditText;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -170,5 +181,45 @@ public class WebViewActivity extends Activity {
             Uri finalUri = uriBuilder.build();
             webView.loadUrl(finalUri.toString());
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        exitKioskMode();
+    }
+
+    public void exitKioskMode() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Beenden des Kiosk-Modus");
+
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        builder.setView(input);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String password = input.getText().toString();
+                if (password.equals("1234")) { // Überprüfen Sie das Passwort
+                    stopLockTask(); // Kiosk-Modus beenden
+                    finish();
+
+                    // Öffnen der MainActivity
+                    Intent intent = new Intent(WebViewActivity.this, MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // Zurücksetzen des Activity-Stacks
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Falsches Passwort", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        builder.setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
     }
 }
