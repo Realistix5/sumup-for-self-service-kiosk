@@ -25,12 +25,12 @@
       android:text="Show Logged In Merchant"/>
 
     <Button
-      android:id="@+id/button_charge"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginBottom="16dp"
-      android:text="Charge"
-      android:layout_gravity="center"/>
+        android:id="@+id/button_logout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="Log out"
+        android:layout_gravity="center"/>
 
     <Button
       android:id="@+id/button_card_reader_page"
@@ -41,28 +41,20 @@
       android:layout_gravity="center"/>
 
     <Button
-      android:id="@+id/button_prepare_card_terminal"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginBottom="16dp"
-      android:text="Prepare Card Terminal"
-      android:layout_gravity="center"/>
-
-    <Button
-      android:id="@+id/button_logout"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginBottom="16dp"
-      android:text="Log out"
-      android:layout_gravity="center"/>
-
-    <!-- activity_main.xml -->
-    <Button
         android:id="@+id/btn_open_webview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:text="Open WebView Activity"
-        android:onClick="openWebViewActivity" />
+        android:onClick="openWebViewActivity"/>
+
+    <Button
+        android:id="@+id/btn_settings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="Settings"
+        android:onClick="openSettingsActivity"/>
 
 
     <ScrollView
@@ -74,49 +66,14 @@
       android:layout_height="wrap_content"
       android:orientation="vertical">
 
-     <TextView
-       android:id="@+id/result"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:textSize="18sp"
-       android:padding="8dp"
-       tools:text="Result code: -"
-       android:layout_gravity="center"/>
-
       <TextView
-        android:id="@+id/result_msg"
+        android:id="@+id/message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="18sp"
         android:padding="8dp"
         tools:text="Message: -"
         android:layout_gravity="center"/>
-
-      <TextView
-        android:id="@+id/tx_code"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:padding="8dp"
-        tools:text="Transaction Code: -"
-        android:layout_gravity="center"/>
-
-      <TextView
-        android:id="@+id/receipt_sent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:padding="8dp"
-        tools:text="Receipt sent : -"/>
-
-      <TextView
-        android:id="@+id/tx_info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:padding="8dp"
-        tools:text="Transaction Info : -"/>
-
     </LinearLayout>
   </ScrollView>
 </LinearLayout>

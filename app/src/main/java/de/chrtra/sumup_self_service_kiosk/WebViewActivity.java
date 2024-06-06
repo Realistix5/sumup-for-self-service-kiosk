@@ -203,11 +203,6 @@ public class WebViewActivity extends Activity {
                 if (password.equals("1234")) { // Überprüfen Sie das Passwort
                     stopLockTask(); // Kiosk-Modus beenden
                     finish();
-
-                    // Öffnen der MainActivity
-                    Intent intent = new Intent(WebViewActivity.this, MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // Zurücksetzen des Activity-Stacks
-                    startActivity(intent);
                 } else {
                     Toast.makeText(getApplicationContext(), "Falsches Passwort", Toast.LENGTH_SHORT).show();
                 }
