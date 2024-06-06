@@ -33,8 +33,8 @@ public class SettingsActivity extends Activity {
     }
 
     private void loadSettings() {
-        String[] settingNames = {"Custom-URL Schema", "Custom-URL Host", "Start-URL", "Rückmeldungs-URL"};
-        String[] settingHints = {"sumup", "bezahlen", "https://meine-seite.de", "https://meine-seite.de/verarbeite_rückmeldung"};
+        String[] settingNames = {"Custom-URL Schema", "Custom-URL Host", "Start-URL", "Erfolgsmeldungs-URL", "Fehlermeldungs-URL"};
+        String[] settingHints = {"sumup", "bezahlen", "https://meine-seite.de", "https://meine-seite.de/erfolg", "https://meine-seite.de/fehler"};
 
         for (int i = 0; i < settingNames.length; i++) {
             TableRow row = new TableRow(this);

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Build;
@@ -43,6 +44,7 @@ public class WebViewActivity extends Activity {
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
     private static final int PAYMENT_REQUEST_CODE = 2; // Request-Code für die PaymentActivity
     private WebView webView;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +67,8 @@ public class WebViewActivity extends Activity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
-                if (uri.toString().startsWith("pay://sumup")) {
+                String starts_with = sharedPreferences.getString("setting1", "")+"://"+sharedPreferences.getString("setting2", "");
+                if (uri.toString().startsWith(starts_with)) {
                     Intent intent = new Intent(view.getContext(), PaymentActivity.class);
                     intent.setData(uri);
                     startActivityForResult(intent, PAYMENT_REQUEST_CODE);
@@ -193,6 +196,13 @@ public class WebViewActivity extends Activity {
         exitKioskMode();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
+    }
+
     public void exitKioskMode() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Beenden des Kiosk-Modus");
@@ -207,6 +217,7 @@ public class WebViewActivity extends Activity {
                 String password = input.getText().toString();
                 if (password.equals("1234")) { // Überprüfen Sie das Passwort
                     stopLockTask(); // Kiosk-Modus beenden
+                    onDestroy();
                     finish();
                 } else {
                     Toast.makeText(getApplicationContext(), "Falsches Passwort", Toast.LENGTH_SHORT).show();
@@ -231,7 +242,6 @@ public class WebViewActivity extends Activity {
                 insetsController.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
             }
         } else {
-            @SuppressWarnings("deprecation")
             final int flags = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                     | View.SYSTEM_UI_FLAG_FULLSCREEN
                     | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
