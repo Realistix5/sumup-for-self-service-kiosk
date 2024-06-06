@@ -13,7 +13,7 @@
       android:icon="@drawable/icon"
       android:label="@string/app_name"
       android:name=".SampleApplication"
-      android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
+      android:theme="@style/AppTheme"
       android:usesCleartextTraffic="true">
 
         <activity
@@ -43,6 +43,7 @@
             android:name=".WebViewActivity"
             android:exported="true">
         </activity>
+        <activity android:name=".SettingsActivity"/>
         <receiver
             android:name=".MyDeviceAdminReceiver"
             android:exported="false"
