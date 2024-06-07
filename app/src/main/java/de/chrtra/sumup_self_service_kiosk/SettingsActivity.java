@@ -1,8 +1,12 @@
 package de.chrtra.sumup_self_service_kiosk;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +22,7 @@ public class SettingsActivity extends Activity {
     private TableLayout tableLayout;
     private Button saveButton;
     private SharedPreferences sharedPreferences;
+    private boolean hasUnsavedChanges = false;
 
     private static class Setting {
         String name;
@@ -31,7 +36,17 @@ public class SettingsActivity extends Activity {
         }
     }
 
-    private List<Setting> settings = new ArrayList<>();
+    private static class SettingGroup {
+        String title;
+        List<Setting> settings;
+
+        SettingGroup(String title, List<Setting> settings) {
+            this.title = title;
+            this.settings = settings;
+        }
+    }
+
+    private List<SettingGroup> settingGroups = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,12 +57,18 @@ public class SettingsActivity extends Activity {
         saveButton = findViewById(R.id.saveButton);
         sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
 
-        // Füge die Einstellungen zur Liste hinzu
-        settings.add(new Setting("Custom-URL Schema", "sumup", "custom_url_schema"));
-        settings.add(new Setting("Custom-URL Host", "bezahlen", "custom_url_host"));
-        settings.add(new Setting("Start-URL", "https://meine-seite.de", "start_url"));
-        settings.add(new Setting("Erfolgsmeldungs-URL", "https://meine-seite.de/erfolg", "success_url"));
-        settings.add(new Setting("Fehlermeldungs-URL", "https://meine-seite.de/fehler", "error_url"));
+        // Füge die Einstellungsgruppen zur Liste hinzu
+        List<Setting> urlSettings = new ArrayList<>();
+        urlSettings.add(new Setting(getString(R.string.payment_url_settings_scheme_label), getString(R.string.payment_url_settings_scheme_hint), "custom_url_schema"));
+        urlSettings.add(new Setting(getString(R.string.payment_url_settings_host_label), getString(R.string.payment_url_settings_host_hint), "custom_url_host"));
+
+        List<Setting> resultUrlSettings = new ArrayList<>();
+        resultUrlSettings.add(new Setting(getString(R.string.website_settings_start_url_label), getString(R.string.website_settings_start_url_hint), "start_url"));
+        resultUrlSettings.add(new Setting(getString(R.string.website_settings_success_url_label), getString(R.string.website_settings_success_url_hint), "success_url"));
+        resultUrlSettings.add(new Setting(getString(R.string.website_settings_error_url_label), getString(R.string.website_settings_error_url_hint), "error_url"));
+
+        settingGroups.add(new SettingGroup(getString(R.string.payment_url_settings_label), urlSettings));
+        settingGroups.add(new SettingGroup(getString(R.string.website_settings_label), resultUrlSettings));
 
         loadSettings();
 
@@ -55,29 +76,53 @@ public class SettingsActivity extends Activity {
     }
 
     private void loadSettings() {
-        for (Setting setting : settings) {
-            TableRow row = new TableRow(this);
-            row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+        for (SettingGroup group : settingGroups) {
+            // Hinzufügen der Gruppenüberschrift
+            TextView header = new TextView(this);
+            header.setText(group.title);
+            header.setGravity(Gravity.START);
+            header.setPadding(0, 20, 0, 10);
+            header.setTextSize(18);
+            tableLayout.addView(header);
 
-            TextView textView = new TextView(this);
-            textView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
-            textView.setText(setting.name);
-            textView.setGravity(Gravity.END);
-            textView.setPadding(0, 0, 16, 0);
+            for (Setting setting : group.settings) {
+                TableRow row = new TableRow(this);
+                row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
 
-            EditText editText = new EditText(this);
-            editText.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-            editText.setHint(setting.hint);
-            editText.setTag(setting.key); // Verwende den Key als Tag
+                TextView textView = new TextView(this);
+                textView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+                textView.setText(setting.name);
+                textView.setGravity(Gravity.END);
+                textView.setPadding(0, 0, 16, 0);
 
-            // Laden der gespeicherten Einstellung für dieses EditText-Feld
-            String savedSetting = sharedPreferences.getString(setting.key, "");
-            editText.setText(savedSetting);
+                EditText editText = new EditText(this);
+                editText.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+                editText.setHint(setting.hint);
+                editText.setTag(setting.key); // Verwende den Key als Tag
 
-            row.addView(textView);
-            row.addView(editText);
+                // Laden der gespeicherten Einstellung für dieses EditText-Feld
+                String savedSetting = sharedPreferences.getString(setting.key, "");
+                editText.setText(savedSetting);
 
-            tableLayout.addView(row);
+                // Hinzufügen eines TextWatchers, um Änderungen zu überwachen
+                editText.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        hasUnsavedChanges = true;
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {}
+                });
+
+                row.addView(textView);
+                row.addView(editText);
+
+                tableLayout.addView(row);
+            }
         }
     }
 
@@ -96,6 +141,21 @@ public class SettingsActivity extends Activity {
         }
 
         editor.apply();
+        hasUnsavedChanges = false;
         finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (hasUnsavedChanges) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Änderungen verwerfen")
+                    .setMessage("Es gibt ungespeicherte Änderungen. Möchten Sie diese verwerfen?")
+                    .setPositiveButton("Ja", (dialog, which) -> finish())
+                    .setNegativeButton("Nein", null)
+                    .show();
+        } else {
+            super.onBackPressed();
+        }
     }
 }

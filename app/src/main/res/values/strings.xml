@@ -1,4 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SumUp SDK Sample App</string>
+    <string name="app_name">Self-Service Kiosk</string>
+
+    <!-- SettingsActivity -->
+    <string name="payment_url_settings_label">Zahlungs Custom-URL</string>
+    <string name="payment_url_settings_scheme_label">URL Schema</string>
+    <string name="payment_url_settings_scheme_hint">sumup</string>
+    <string name="payment_url_settings_host_label">URL Host</string>
+    <string name="payment_url_settings_host_hint">bezahlen</string>
+
+    <string name="website_settings_label">Webseite</string>
+    <string name="website_settings_start_url_label">Start-URL</string>
+    <string name="website_settings_start_url_hint">https://meine-seite.de</string>
+    <string name="website_settings_success_url_label">Erfolgsmeldungs-URL</string>
+    <string name="website_settings_success_url_hint">https://meine-seite.de/erfolg</string>
+    <string name="website_settings_error_url_label">Fehlermeldungs-URL</string>
+    <string name="website_settings_error_url_hint">https://meine-seite.de/fehler</string>
+
+    <string name="save_settings_button_text">Speichern</string>
+
+    <!-- More strings -->
+
 </resources>
