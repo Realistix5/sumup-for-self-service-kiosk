@@ -2,6 +2,8 @@ package de.chrtra.sumup_self_service_kiosk;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.KeyguardManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,12 +26,6 @@ import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.text.InputType;
-import android.widget.EditText;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -43,6 +39,7 @@ public class WebViewActivity extends Activity {
 
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
     private static final int PAYMENT_REQUEST_CODE = 2; // Request-Code für die PaymentActivity
+    private static final int DEVICE_PIN_REQUEST_CODE = 101; // Request-Code für die Geräte-PIN-Abfrage
     private WebView webView;
     private SharedPreferences sharedPreferences;
 
@@ -185,6 +182,16 @@ public class WebViewActivity extends Activity {
             Uri finalUri = uriBuilder.build();
             webView.loadUrl(finalUri.toString());
         }
+
+        if (requestCode == DEVICE_PIN_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                stopLockTask(); // Kiosk-Modus beenden
+                onDestroy();
+                finish();
+            } else {
+                Toast.makeText(getApplicationContext(), "Authentifizierung fehlgeschlagen", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override
@@ -200,34 +207,15 @@ public class WebViewActivity extends Activity {
     }
 
     public void exitKioskMode() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Beenden des Kiosk-Modus");
-
-        final EditText input = new EditText(this);
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        builder.setView(input);
-
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String password = input.getText().toString();
-                if (password.equals("1234")) { // Überprüfen Sie das Passwort
-                    stopLockTask(); // Kiosk-Modus beenden
-                    onDestroy();
-                    finish();
-                } else {
-                    Toast.makeText(getApplicationContext(), "Falsches Passwort", Toast.LENGTH_SHORT).show();
-                }
+        KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+        if (keyguardManager != null && keyguardManager.isKeyguardSecure()) {
+            Intent intent = keyguardManager.createConfirmDeviceCredentialIntent("Geräte-PIN erforderlich", "Bitte geben Sie Ihre Geräte-PIN ein, um den Kiosk-Modus zu beenden.");
+            if (intent != null) {
+                startActivityForResult(intent, DEVICE_PIN_REQUEST_CODE);
             }
-        });
-        builder.setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-
-        builder.show();
+        } else {
+            Toast.makeText(this, "Gerätesperre ist nicht eingerichtet. Der Kiosk-Modus kann nicht beendet werden.", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void enableImmersiveMode() {
