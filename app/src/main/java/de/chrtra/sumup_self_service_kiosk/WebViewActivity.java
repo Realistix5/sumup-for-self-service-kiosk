@@ -57,6 +57,8 @@ public class WebViewActivity extends Activity {
 
         enableImmersiveMode();
 
+        sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
+
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setMediaPlaybackRequiresUserGesture(false); // Ermöglicht automatische Medienwiedergabe
@@ -67,7 +69,7 @@ public class WebViewActivity extends Activity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
-                String starts_with = sharedPreferences.getString("setting1", "")+"://"+sharedPreferences.getString("setting2", "");
+                String starts_with = sharedPreferences.getString("custom_url_schema", "")+"://"+sharedPreferences.getString("custom_url_host", "");
                 if (uri.toString().startsWith(starts_with)) {
                     Intent intent = new Intent(view.getContext(), PaymentActivity.class);
                     intent.setData(uri);
@@ -141,7 +143,7 @@ public class WebViewActivity extends Activity {
         if (url != null && !url.isEmpty()) {
             webView.loadUrl(url);
         } else {
-            webView.loadUrl("https://192.168.178.79:8000/"); // Standard URL laden, falls keine URL übermittelt wurde
+            webView.loadUrl(sharedPreferences.getString("start_url", "")); // Standard URL laden, falls keine URL übermittelt wurde
         }
     }
 
@@ -151,25 +153,19 @@ public class WebViewActivity extends Activity {
 
         if (requestCode == PAYMENT_REQUEST_CODE && data != null) {
             Uri.Builder uriBuilder;
-            String url;
 
             switch (resultCode) {
                 case 1:
                     // Success
                     String transactionInfo = data.getStringExtra("paid");
 
-                    uriBuilder = Uri.parse("https://192.168.178.79:8000/process_payment/")
+                    uriBuilder = Uri.parse(sharedPreferences.getString("success_url", ""))
                             .buildUpon()
                             .appendQueryParameter("paid", transactionInfo);
                     break;
 
-                case 2:
-                    // Failed
-                    uriBuilder = Uri.parse("https://192.168.178.79:8000/payment_failed/").buildUpon();
-                    break;
-
                 default:
-                    uriBuilder = Uri.parse("https://192.168.178.79:8000/payment_problem/")
+                    uriBuilder = Uri.parse(sharedPreferences.getString("error_url", ""))
                             .buildUpon()
                             .appendQueryParameter("code", String.valueOf(resultCode));
                     break;
