@@ -142,6 +142,7 @@ public class SettingsActivity extends Activity {
 
         editor.apply();
         hasUnsavedChanges = false;
+        setResult(Activity.RESULT_OK); // Setze resultCode auf RESULT_OK (1)
         finish();
     }
 
@@ -151,10 +152,14 @@ public class SettingsActivity extends Activity {
             new AlertDialog.Builder(this)
                     .setTitle("Änderungen verwerfen")
                     .setMessage("Es gibt ungespeicherte Änderungen. Möchten Sie diese verwerfen?")
-                    .setPositiveButton("Ja", (dialog, which) -> finish())
+                    .setPositiveButton("Ja", (dialog, which) -> {
+                        setResult(Activity.RESULT_CANCELED); // Setze resultCode auf RESULT_CANCELED (0)
+                        finish();
+                    })
                     .setNegativeButton("Nein", null)
                     .show();
         } else {
+            setResult(1); // Setze resultCode auf RESULT_CANCELED (0), wenn keine ungespeicherten Änderungen vorhanden sind
             super.onBackPressed();
         }
     }

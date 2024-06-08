@@ -18,6 +18,8 @@ public class MainActivity extends Activity {
     private static final int REQUEST_CODE_LOGIN = 1;
     private static final int REQUEST_CODE_WEBVIEW = 2;
     private static final int REQUEST_CODE_CARD_READER_PAGE = 4;
+    private static final int REQUEST_CODE_SETTINGS = 11;
+
 
     private TextView mMessage;
 
@@ -32,7 +34,7 @@ public class MainActivity extends Activity {
 
         findViews();
 
-        mMessage.setText("");
+        mMessage.setText("Wilkommen in der Self-Service Kiosk App!");
 
         Button login = (Button) findViewById(R.id.button_login);
         login.setOnClickListener(new View.OnClickListener() {
@@ -77,7 +79,16 @@ public class MainActivity extends Activity {
                 }
                 break;
             case REQUEST_CODE_WEBVIEW:
-                mMessage.setText("Kiosk-Modus beendet.");
+                mMessage.setText("Kiosk-Modus wurde beendet.");
+                break;
+            case REQUEST_CODE_SETTINGS:
+                if (resultCode == Activity.RESULT_OK) {
+                    mMessage.setText("Einstellungen gespeichert.");
+                } else if (resultCode == Activity.RESULT_CANCELED) {
+                    mMessage.setText("Änderungen an den Einstellungen wurden verworfen.");
+                } else if (resultCode == 1) {
+                    mMessage.setText("");
+                }
                 break;
             default:
                 break;
@@ -95,6 +106,6 @@ public class MainActivity extends Activity {
 
     public void openSettingsActivity(View view) {
         Intent intent = new Intent(this, SettingsActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, REQUEST_CODE_SETTINGS);
     }
 }
