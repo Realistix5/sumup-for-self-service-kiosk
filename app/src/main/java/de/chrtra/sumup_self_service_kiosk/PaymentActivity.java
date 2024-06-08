@@ -49,11 +49,20 @@ public class PaymentActivity extends Activity {
                 }
                 paymentBuilder.currency(currency);
 
+                if (sharedPreferences.getBoolean("tip_on_card_reader", false)) {
+                    paymentBuilder.tipOnCardReader();
+                }
                 if (sharedPreferences.getBoolean("skip_failed_screen", false)) {
                     paymentBuilder.skipFailedScreen();
                 }
                 if (sharedPreferences.getBoolean("skip_success_screen", false)) {
                     paymentBuilder.skipSuccessScreen();
+                }
+
+                // Handle default additional info
+                Map<String, String> additionalInfo = convertStringToMap(sharedPreferences.getString("additional_info", ""));
+                for (Map.Entry<String, String> entry : additionalInfo.entrySet()) {
+                    paymentBuilder.addAdditionalInfo(entry.getKey(), entry.getValue());
                 }
 
                 SumUpPayment payment = paymentBuilder.build();
@@ -96,5 +105,23 @@ public class PaymentActivity extends Activity {
             setResult(resultCode, resultIntent);
             finish();
         }
+    }
+    public static Map<String, String> convertStringToMap(String input) {
+        Map<String, String> keyValuePairs = new HashMap<>();
+
+        // Split the input string by newline characters
+        String[] lines = input.split("\n");
+
+        for (String line : lines) {
+            // Split each line by the first occurrence of ": "
+            String[] parts = line.split(": ", 2);
+            if (parts.length == 2) {
+                String key = parts[0].trim();
+                String value = parts[1].trim();
+                keyValuePairs.put(key, value);
+            }
+        }
+
+        return keyValuePairs;
     }
 }
