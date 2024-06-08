@@ -32,8 +32,6 @@
     <string name="payment_settings_affiliate_key_label">SumUp Affiliate Key</string>
     <string name="payment_settings_affiliate_key_hint">sup_afk_abcdefg123xyz</string>
     <string name="payment_settings_tip_on_card_reader_label">Auf Kartenlesegerät Trinkgeld eingeben</string>
-    <string name="payment_settings_additional_info_label">Zusätzliche Informationen</string>
-    <string name="payment_settings_additional_info_hint">nachricht: Vielen Dank für Ihre Zahlung!</string>
 
     <!-- More strings -->
 
