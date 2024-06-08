@@ -32,8 +32,8 @@ public class PaymentActivity extends Activity {
                 queryParams.put(parameter, uri.getQueryParameter(parameter));
             }
 
-            if (queryParams.containsKey("amount")) {
-                String amount = queryParams.get("amount");
+            if (queryParams.containsKey("total")) {
+                String amount = queryParams.get("total");
                 String title = sharedPreferences.getString("payment_title", "");
 
                 SumUpPayment.Builder paymentBuilder = SumUpPayment.builder()
