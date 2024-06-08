@@ -78,6 +78,8 @@ public class SettingsActivity extends Activity {
         settingGroups.add(new SettingGroup(getString(R.string.webview_settings_label), webViewSettings));
 
         List<Setting> paymentSettings = new ArrayList<>();
+        paymentSettings.add(new Setting(getString(R.string.payment_settings_affiliate_key_label), getString(R.string.payment_settings_affiliate_key_hint), "affiliate_key", false));
+        paymentSettings.add(new Setting(getString(R.string.payment_settings_currency_code_label), getString(R.string.payment_settings_currency_code_hint), "currency", false));
         paymentSettings.add(new Setting(getString(R.string.payment_settings_title_label), getString(R.string.payment_settings_title_hint), "payment_title", false));
         paymentSettings.add(new Setting(getString(R.string.payment_settings_skip_success_screen_label), "", "skip_success_screen", true));
         paymentSettings.add(new Setting(getString(R.string.payment_settings_skip_error_screen_label), "", "skip_failed_screen", true));

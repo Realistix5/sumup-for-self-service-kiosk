@@ -27,6 +27,10 @@
     <string name="payment_settings_skip_error_screen_label">Überspringe Fehler Seite</string>
     <string name="payment_settings_title_label">Zahlungs-Titel</string>
     <string name="payment_settings_title_hint">Zahlung an Verein XY e.V.</string>
+    <string name="payment_settings_currency_code_label">Währungs-Code</string>
+    <string name="payment_settings_currency_code_hint">7 für EUR</string>
+    <string name="payment_settings_affiliate_key_label">SumUp Affiliate Key</string>
+    <string name="payment_settings_affiliate_key_hint">sup_afk_abcdefg123xyz</string>
 
     <!-- More strings -->
 

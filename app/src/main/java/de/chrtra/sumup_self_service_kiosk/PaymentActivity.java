@@ -41,6 +41,14 @@ public class PaymentActivity extends Activity {
                         .currency(SumUpPayment.Currency.EUR)
                         .title(title);
 
+                SumUpPayment.Currency currency;
+                try {
+                    currency = SumUpPayment.Currency.valueOf(sharedPreferences.getString("currency", "EUR"));
+                } catch (IllegalArgumentException e) {
+                    currency = SumUpPayment.Currency.valueOf( "EUR");
+                }
+                paymentBuilder.currency(currency);
+
                 if (sharedPreferences.getBoolean("skip_failed_screen", false)) {
                     paymentBuilder.skipFailedScreen();
                 }

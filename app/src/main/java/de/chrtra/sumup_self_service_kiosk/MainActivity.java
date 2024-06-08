@@ -2,6 +2,7 @@ package de.chrtra.sumup_self_service_kiosk;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -20,8 +21,15 @@ public class MainActivity extends Activity {
     private static final int REQUEST_CODE_CARD_READER_PAGE = 4;
     private static final int REQUEST_CODE_SETTINGS = 11;
 
+    private SharedPreferences sharedPreferences;
 
     private TextView mMessage;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +49,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 // Please go to https://me.sumup.com/developers to get your Affiliate Key by entering the application ID of your app. (e.g. com.sumup.sdksampleapp)
-                SumUpLogin sumupLogin = SumUpLogin.builder("sup_afk_CEmmyW58Brq8BOivwmxvnWO52jje9WpO").build();
+                SumUpLogin sumupLogin = SumUpLogin.builder(sharedPreferences.getString("affiliate_key", "")).build();
                 SumUpAPI.openLoginActivity(MainActivity.this, sumupLogin, REQUEST_CODE_LOGIN);
             }
         });
