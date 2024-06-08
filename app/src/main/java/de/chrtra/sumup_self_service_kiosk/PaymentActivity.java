@@ -157,5 +157,10 @@ public class PaymentActivity extends Activity {
             setResult(resultCode, resultIntent);
             finish();
         }
+        Intent resultIntent = new Intent();
+        resultIntent.putStringArrayListExtra("params", new ArrayList<>(queryParams.keySet()));
+        resultIntent.putExtra("code", resultCode);
+        setResult(resultCode, resultIntent);
+        finish();
     }
 }
