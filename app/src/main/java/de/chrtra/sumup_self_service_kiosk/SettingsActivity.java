@@ -10,6 +10,7 @@ import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -23,16 +24,19 @@ public class SettingsActivity extends Activity {
     private Button saveButton;
     private SharedPreferences sharedPreferences;
     private boolean hasUnsavedChanges = false;
+    public static final int RESULT_NO_CHANGES = 33;
 
     private static class Setting {
         String name;
         String hint;
         String key;
+        boolean isBoolean;
 
-        Setting(String name, String hint, String key) {
+        Setting(String name, String hint, String key, boolean isBoolean) {
             this.name = name;
             this.hint = hint;
             this.key = key;
+            this.isBoolean = isBoolean;
         }
     }
 
@@ -59,16 +63,20 @@ public class SettingsActivity extends Activity {
 
         // Füge die Einstellungsgruppen zur Liste hinzu
         List<Setting> urlSettings = new ArrayList<>();
-        urlSettings.add(new Setting(getString(R.string.payment_url_settings_scheme_label), getString(R.string.payment_url_settings_scheme_hint), "custom_url_schema"));
-        urlSettings.add(new Setting(getString(R.string.payment_url_settings_host_label), getString(R.string.payment_url_settings_host_hint), "custom_url_host"));
+        urlSettings.add(new Setting(getString(R.string.payment_url_settings_scheme_label), getString(R.string.payment_url_settings_scheme_hint), "custom_url_schema", false));
+        urlSettings.add(new Setting(getString(R.string.payment_url_settings_host_label), getString(R.string.payment_url_settings_host_hint), "custom_url_host", false));
 
         List<Setting> resultUrlSettings = new ArrayList<>();
-        resultUrlSettings.add(new Setting(getString(R.string.website_settings_start_url_label), getString(R.string.website_settings_start_url_hint), "start_url"));
-        resultUrlSettings.add(new Setting(getString(R.string.website_settings_success_url_label), getString(R.string.website_settings_success_url_hint), "success_url"));
-        resultUrlSettings.add(new Setting(getString(R.string.website_settings_error_url_label), getString(R.string.website_settings_error_url_hint), "error_url"));
+        resultUrlSettings.add(new Setting(getString(R.string.website_settings_start_url_label), getString(R.string.website_settings_start_url_hint), "start_url", false));
+        resultUrlSettings.add(new Setting(getString(R.string.website_settings_success_url_label), getString(R.string.website_settings_success_url_hint), "success_url", false));
+        resultUrlSettings.add(new Setting(getString(R.string.website_settings_error_url_label), getString(R.string.website_settings_error_url_hint), "error_url", false));
+
+        List<Setting> webViewSettings = new ArrayList<>();
+        webViewSettings.add(new Setting(getString(R.string.webview_settings_ignore_ssl_errors_label), "", "ignore_ssl_errors", true));
 
         settingGroups.add(new SettingGroup(getString(R.string.payment_url_settings_label), urlSettings));
         settingGroups.add(new SettingGroup(getString(R.string.website_settings_label), resultUrlSettings));
+        settingGroups.add(new SettingGroup(getString(R.string.webview_settings_label), webViewSettings));
 
         loadSettings();
 
@@ -95,31 +103,47 @@ public class SettingsActivity extends Activity {
                 textView.setGravity(Gravity.END);
                 textView.setPadding(0, 0, 16, 0);
 
-                EditText editText = new EditText(this);
-                editText.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-                editText.setHint(setting.hint);
-                editText.setTag(setting.key); // Verwende den Key als Tag
+                if (setting.isBoolean) {
+                    CheckBox checkBox = new CheckBox(this);
+                    checkBox.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+                    checkBox.setTag(setting.key);
 
-                // Laden der gespeicherten Einstellung für dieses EditText-Feld
-                String savedSetting = sharedPreferences.getString(setting.key, "");
-                editText.setText(savedSetting);
+                    // Laden der gespeicherten Einstellung für dieses CheckBox-Feld
+                    boolean savedSetting = sharedPreferences.getBoolean(setting.key, false);
+                    checkBox.setChecked(savedSetting);
 
-                // Hinzufügen eines TextWatchers, um Änderungen zu überwachen
-                editText.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                    // Hinzufügen eines OnCheckedChangeListener, um Änderungen zu überwachen
+                    checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> hasUnsavedChanges = true);
 
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        hasUnsavedChanges = true;
-                    }
+                    row.addView(textView);
+                    row.addView(checkBox);
+                } else {
+                    EditText editText = new EditText(this);
+                    editText.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+                    editText.setHint(setting.hint);
+                    editText.setTag(setting.key);
 
-                    @Override
-                    public void afterTextChanged(Editable s) {}
-                });
+                    // Laden der gespeicherten Einstellung für dieses EditText-Feld
+                    String savedSetting = sharedPreferences.getString(setting.key, "");
+                    editText.setText(savedSetting);
 
-                row.addView(textView);
-                row.addView(editText);
+                    // Hinzufügen eines TextWatchers, um Änderungen zu überwachen
+                    editText.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                            hasUnsavedChanges = true;
+                        }
+
+                        @Override
+                        public void afterTextChanged(Editable s) {}
+                    });
+
+                    row.addView(textView);
+                    row.addView(editText);
+                }
 
                 tableLayout.addView(row);
             }
@@ -129,14 +153,21 @@ public class SettingsActivity extends Activity {
     private void saveSettings() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        // Iteriere über alle TableRow-Kinder und speichere die Werte der EditText-Felder
+        // Iteriere über alle TableRow-Kinder und speichere die Werte der EditText- und CheckBox-Felder
         for (int i = 0; i < tableLayout.getChildCount(); i++) {
             View view = tableLayout.getChildAt(i);
             if (view instanceof TableRow) {
                 TableRow row = (TableRow) view;
-                EditText editText = (EditText) row.getChildAt(1); // Das zweite Kind ist das EditText-Feld
-                String key = (String) editText.getTag(); // Hole den Key aus dem Tag
-                editor.putString(key, editText.getText().toString());
+                View valueView = row.getChildAt(1);
+                if (valueView instanceof EditText) {
+                    EditText editText = (EditText) valueView;
+                    String key = (String) editText.getTag();
+                    editor.putString(key, editText.getText().toString());
+                } else if (valueView instanceof CheckBox) {
+                    CheckBox checkBox = (CheckBox) valueView;
+                    String key = (String) checkBox.getTag();
+                    editor.putBoolean(key, checkBox.isChecked());
+                }
             }
         }
 
@@ -159,7 +190,7 @@ public class SettingsActivity extends Activity {
                     .setNegativeButton("Nein", null)
                     .show();
         } else {
-            setResult(1); // Setze resultCode auf RESULT_CANCELED (0), wenn keine ungespeicherten Änderungen vorhanden sind
+            setResult(RESULT_NO_CHANGES); // Setze resultCode auf RESULT_NO_CHANGES (33), wenn keine ungespeicherten Änderungen vorhanden sind
             super.onBackPressed();
         }
     }

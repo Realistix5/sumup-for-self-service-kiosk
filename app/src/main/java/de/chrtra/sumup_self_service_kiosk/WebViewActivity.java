@@ -62,6 +62,7 @@ public class WebViewActivity extends Activity {
         webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
         webView.setWebViewClient(new WebViewClient() {
+            final boolean ignoreSslErrors = sharedPreferences.getBoolean("ignore_ssl_errors", false);
             // Start intent for custom url scheme
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
@@ -77,33 +78,14 @@ public class WebViewActivity extends Activity {
                 }
             }
 
-            // Get Dialogue on received SSL error
+            // If option is set ignore SslErrors
             @Override
             public void onReceivedSslError(WebView view, final SslErrorHandler handler, SslError error) {
-                final AlertDialog.Builder builder = new AlertDialog.Builder(WebViewActivity.this);
-                String message = "SSL Certificate error.";
-                switch (error.getPrimaryError()) {
-                    case SslError.SSL_UNTRUSTED:
-                        message = "The certificate authority is not trusted.";
-                        break;
-                    case SslError.SSL_EXPIRED:
-                        message = "The certificate has expired.";
-                        break;
-                    case SslError.SSL_IDMISMATCH:
-                        message = "The certificate Hostname mismatch.";
-                        break;
-                    case SslError.SSL_NOTYETVALID:
-                        message = "The certificate is not yet valid.";
-                        break;
+                if (ignoreSslErrors) {
+                    handler.proceed();
+                } else {
+                    super.onReceivedSslError(view, handler, error);
                 }
-                message += " Do you want to continue anyway?";
-
-                builder.setTitle("SSL Certificate Error");
-                builder.setMessage(message);
-                builder.setPositiveButton("continue", (dialog, which) -> handler.proceed());
-                builder.setNegativeButton("cancel", (dialog, which) -> handler.cancel());
-                final AlertDialog dialog = builder.create();
-                dialog.show();
             }
 
             // Don't request favicon.ico

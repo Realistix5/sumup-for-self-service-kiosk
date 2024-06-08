@@ -86,7 +86,7 @@ public class MainActivity extends Activity {
                     mMessage.setText("Einstellungen gespeichert.");
                 } else if (resultCode == Activity.RESULT_CANCELED) {
                     mMessage.setText("Änderungen an den Einstellungen wurden verworfen.");
-                } else if (resultCode == 1) {
+                } else if (resultCode == SettingsActivity.RESULT_NO_CHANGES) {
                     mMessage.setText("");
                 }
                 break;

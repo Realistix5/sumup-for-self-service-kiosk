@@ -19,6 +19,9 @@
 
     <string name="save_settings_button_text">Speichern</string>
 
+    <string name="webview_settings_label">WebView</string>
+    <string name="webview_settings_ignore_ssl_errors_label">Ignoriere SSL Fehler</string>
+
     <!-- More strings -->
 
 </resources>
