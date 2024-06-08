@@ -22,6 +22,12 @@
     <string name="webview_settings_label">WebView</string>
     <string name="webview_settings_ignore_ssl_errors_label">Ignoriere SSL Fehler</string>
 
+    <string name="payment_settings_label">Zahlungen</string>
+    <string name="payment_settings_skip_success_screen_label">Überspringe Erfolgs Seite</string>
+    <string name="payment_settings_skip_error_screen_label">Überspringe Fehler Seite</string>
+    <string name="payment_settings_title_label">Zahlungs-Titel</string>
+    <string name="payment_settings_title_hint">Zahlung an Verein XY e.V.</string>
+
     <!-- More strings -->
 
 </resources>

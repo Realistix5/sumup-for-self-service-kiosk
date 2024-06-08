@@ -65,18 +65,23 @@ public class SettingsActivity extends Activity {
         List<Setting> urlSettings = new ArrayList<>();
         urlSettings.add(new Setting(getString(R.string.payment_url_settings_scheme_label), getString(R.string.payment_url_settings_scheme_hint), "custom_url_schema", false));
         urlSettings.add(new Setting(getString(R.string.payment_url_settings_host_label), getString(R.string.payment_url_settings_host_hint), "custom_url_host", false));
+        settingGroups.add(new SettingGroup(getString(R.string.payment_url_settings_label), urlSettings));
 
         List<Setting> resultUrlSettings = new ArrayList<>();
         resultUrlSettings.add(new Setting(getString(R.string.website_settings_start_url_label), getString(R.string.website_settings_start_url_hint), "start_url", false));
         resultUrlSettings.add(new Setting(getString(R.string.website_settings_success_url_label), getString(R.string.website_settings_success_url_hint), "success_url", false));
         resultUrlSettings.add(new Setting(getString(R.string.website_settings_error_url_label), getString(R.string.website_settings_error_url_hint), "error_url", false));
+        settingGroups.add(new SettingGroup(getString(R.string.website_settings_label), resultUrlSettings));
 
         List<Setting> webViewSettings = new ArrayList<>();
         webViewSettings.add(new Setting(getString(R.string.webview_settings_ignore_ssl_errors_label), "", "ignore_ssl_errors", true));
-
-        settingGroups.add(new SettingGroup(getString(R.string.payment_url_settings_label), urlSettings));
-        settingGroups.add(new SettingGroup(getString(R.string.website_settings_label), resultUrlSettings));
         settingGroups.add(new SettingGroup(getString(R.string.webview_settings_label), webViewSettings));
+
+        List<Setting> paymentSettings = new ArrayList<>();
+        paymentSettings.add(new Setting(getString(R.string.payment_settings_title_label), getString(R.string.payment_settings_title_hint), "payment_title", false));
+        paymentSettings.add(new Setting(getString(R.string.payment_settings_skip_success_screen_label), "", "skip_success_screen", true));
+        paymentSettings.add(new Setting(getString(R.string.payment_settings_skip_error_screen_label), "", "skip_failed_screen", true));
+        settingGroups.add(new SettingGroup(getString(R.string.payment_settings_label), paymentSettings));
 
         loadSettings();
 

@@ -2,6 +2,7 @@ package de.chrtra.sumup_self_service_kiosk;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import com.sumup.merchant.reader.api.SumUpAPI;
@@ -15,10 +16,13 @@ import java.util.Map;
 public class PaymentActivity extends Activity {
 
     private Map<String, String> queryParams;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
 
         queryParams = new HashMap<>();
 
@@ -30,14 +34,21 @@ public class PaymentActivity extends Activity {
 
             if (queryParams.containsKey("amount")) {
                 String amount = queryParams.get("amount");
+                String title = sharedPreferences.getString("payment_title", "");
 
-                SumUpPayment payment = SumUpPayment.builder()
+                SumUpPayment.Builder paymentBuilder = SumUpPayment.builder()
                         .total(new BigDecimal(amount)) // Der minimale Betrag ist 1.00
                         .currency(SumUpPayment.Currency.EUR)
-                        .title("Zahlung an den GSV Gundernhausen e.V.")
-                        .skipSuccessScreen()
-                        .skipFailedScreen()
-                        .build();
+                        .title(title);
+
+                if (sharedPreferences.getBoolean("skip_failed_screen", false)) {
+                    paymentBuilder.skipFailedScreen();
+                }
+                if (sharedPreferences.getBoolean("skip_success_screen", false)) {
+                    paymentBuilder.skipSuccessScreen();
+                }
+
+                SumUpPayment payment = paymentBuilder.build();
 
                 SumUpAPI.checkout(this, payment, 2); // '2' ist der Request-Code für die Activity-Result-Rückgabe
             }
