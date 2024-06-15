@@ -1,18 +1,22 @@
 package de.chrtra.sumup_self_service_kiosk;
 
 import android.app.Activity;
+import android.app.KeyguardManager;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
-import android.content.Context;
+import android.widget.Toast;
 
 import com.sumup.merchant.reader.api.SumUpAPI;
 import com.sumup.merchant.reader.api.SumUpLogin;
+
+import java.util.Objects;
 
 public class MainActivity extends Activity {
 
@@ -73,6 +77,47 @@ public class MainActivity extends Activity {
 
         Button btnLogout = (Button) findViewById(R.id.button_logout);
         btnLogout.setOnClickListener(v -> SumUpAPI.logout());
+
+        Button openWebView = (Button) findViewById(R.id.btn_open_webview);
+        openWebView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (areSettingsValid()) {
+                    if (SumUpAPI.isLoggedIn()) {
+                        requestDevicePIN();
+                    } else {
+                        openLoginActivity();
+                    }
+                } else {
+                    Toast.makeText(MainActivity.this, "Bitte setzen Sie alle erforderlichen Einstellungen.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private boolean areSettingsValid() {
+        // Hier die Logik hinzufügen, um die erforderlichen Einstellungen zu überprüfen
+        // Zum Beispiel:
+        String setting1 = sharedPreferences.getString("start_url", "");
+        String setting2 = sharedPreferences.getString("success_url", "");
+        return !setting1.isEmpty() && !setting2.isEmpty();
+    }
+
+    private void openLoginActivity() {
+        SumUpLogin sumupLogin = SumUpLogin.builder(sharedPreferences.getString("affiliate_key", "")).build();
+        SumUpAPI.openLoginActivity(MainActivity.this, sumupLogin, REQUEST_CODE_LOGIN);
+    }
+
+    private void requestDevicePIN() {
+        KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+        if (keyguardManager != null && keyguardManager.isKeyguardSecure()) {
+            Intent intent = keyguardManager.createConfirmDeviceCredentialIntent("Geräte-PIN erforderlich", "Bitte geben Sie Ihre Geräte-PIN ein, um den Kiosk-Modus zu beenden.");
+            if (intent != null) {
+                openWebViewActivity();
+            }
+        } else {
+            Toast.makeText(this, "Gerätesperre ist nicht eingerichtet. Der Kiosk-Modus kann nicht beendet werden.", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -85,9 +130,6 @@ public class MainActivity extends Activity {
                     String message = extra.getString(SumUpAPI.Response.MESSAGE);
                     mMessage.setText(message);
                 }
-                break;
-            case REQUEST_CODE_WEBVIEW:
-                mMessage.setText("Kiosk-Modus wurde beendet.");
                 break;
             case REQUEST_CODE_SETTINGS:
                 if (resultCode == Activity.RESULT_OK) {
@@ -103,13 +145,13 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void findViews() {
-        mMessage = (TextView) findViewById(R.id.message);
-    }
-
-    public void openWebViewActivity(View view) {
+    private void openWebViewActivity() {
         Intent intent = new Intent(this, WebViewActivity.class);
         startActivityForResult(intent, REQUEST_CODE_WEBVIEW);
+    }
+
+    private void findViews() {
+        mMessage = (TextView) findViewById(R.id.message);
     }
 
     public void openSettingsActivity(View view) {
