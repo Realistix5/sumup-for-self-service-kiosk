@@ -171,7 +171,7 @@ public class WebViewActivity extends Activity {
                 onDestroy();
                 finish();
             } else {
-                Toast.makeText(getApplicationContext(), "Authentifizierung fehlgeschlagen", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), R.string.authentification_failed_message, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -191,12 +191,12 @@ public class WebViewActivity extends Activity {
     public void exitKioskMode() {
         KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
         if (keyguardManager != null && keyguardManager.isKeyguardSecure()) {
-            Intent intent = keyguardManager.createConfirmDeviceCredentialIntent("Geräte-PIN erforderlich", "Bitte geben Sie Ihre Geräte-PIN ein, um den Kiosk-Modus zu beenden.");
+            Intent intent = keyguardManager.createConfirmDeviceCredentialIntent(getString(R.string.device_pin_required_title), getString(R.string.device_pin_required_description));
             if (intent != null) {
                 startActivityForResult(intent, DEVICE_PIN_REQUEST_CODE);
             }
         } else {
-            Toast.makeText(this, "Gerätesperre ist nicht eingerichtet. Der Kiosk-Modus kann nicht beendet werden.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.no_device_lock_available_message, Toast.LENGTH_LONG).show();
         }
     }
 

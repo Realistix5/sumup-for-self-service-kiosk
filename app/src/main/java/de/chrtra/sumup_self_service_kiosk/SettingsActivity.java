@@ -190,13 +190,13 @@ public class SettingsActivity extends Activity {
     public void onBackPressed() {
         if (hasUnsavedChanges) {
             new AlertDialog.Builder(this)
-                    .setTitle("Änderungen verwerfen")
-                    .setMessage("Es gibt ungespeicherte Änderungen. Möchten Sie diese verwerfen?")
-                    .setPositiveButton("Ja", (dialog, which) -> {
+                    .setTitle(R.string.unsaved_changes_title)
+                    .setMessage(R.string.unsaved_changes_message)
+                    .setPositiveButton(R.string.unsaved_changes_response_positive, (dialog, which) -> {
                         setResult(Activity.RESULT_CANCELED); // Setze resultCode auf RESULT_CANCELED (0)
                         finish();
                     })
-                    .setNegativeButton("Nein", null)
+                    .setNegativeButton(R.string.unsaved_changes_response_negative, null)
                     .show();
         } else {
             setResult(RESULT_NO_CHANGES); // Setze resultCode auf RESULT_NO_CHANGES (33), wenn keine ungespeicherten Änderungen vorhanden sind

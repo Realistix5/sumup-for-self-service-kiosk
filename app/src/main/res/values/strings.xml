@@ -33,6 +33,22 @@
     <string name="payment_settings_affiliate_key_hint">sup_afk_abcdefg123xyz</string>
     <string name="payment_settings_tip_on_card_reader_label">Auf Kartenlesegerät Trinkgeld eingeben</string>
 
+    <!-- Messages -->
+    <string name="not_logged_in_message">Nicht eingeloggt.</string>
+    <string name="device_pin_required_title">Geräte-PIN erforderlich</string>
+    <string name="device_pin_required_description">Bitte geben Sie Ihre Geräte-PIN ein, um den Kiosk-Modus zu beenden.</string>
+    <string name="no_device_lock_available_message">Gerätesperre ist nicht eingerichtet. Der Kiosk-Modus kann nicht beendet werden.</string>
+    <string name="authentification_failed_message">Authentifizierung fehlgeschlagen</string>
+    <string name="settings_saved_message">Einstellungen gespeichert.</string>
+    <string name="settings_discarded_message">Änderungen an den Einstellungen wurden verworfen.</string>
+    <string name="welcome_message">Wilkommen in der Self-Service Kiosk App!</string>
+    <string name="settings_not_set_message">Bitte setzen Sie alle erforderlichen Einstellungen.</string>
+    <string name="unsaved_changes_title">Änderungen verwerfen</string>
+
+    <string name="unsaved_changes_message">Es gibt ungespeicherte Änderungen. Möchten Sie diese verwerfen?</string>
+    <string name="unsaved_changes_response_positive">Ja</string>
+    <string name="unsaved_changes_response_negative">Nein</string>
+
     <!-- More strings -->
 
 </resources>

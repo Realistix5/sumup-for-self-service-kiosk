@@ -47,7 +47,7 @@ public class MainActivity extends Activity {
 
         findViews();
 
-        mMessage.setText("Wilkommen in der Self-Service Kiosk App!");
+        mMessage.setText(R.string.welcome_message);
 
         Button login = (Button) findViewById(R.id.button_login);
         login.setOnClickListener(new View.OnClickListener() {
@@ -64,7 +64,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 if (!SumUpAPI.isLoggedIn()) {
-                    mMessage.setText("Not logged in");
+                    mMessage.setText(R.string.not_logged_in_message);
                 } else {
                     mMessage.setText(
                             String.format("Currency: %s, Merchant Code: %s", SumUpAPI.getCurrentMerchant().getCurrency().getIsoCode(),
@@ -90,7 +90,7 @@ public class MainActivity extends Activity {
                         openLoginActivity();
                     }
                 } else {
-                    Toast.makeText(MainActivity.this, "Bitte setzen Sie alle erforderlichen Einstellungen.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, R.string.settings_not_set_message, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -112,12 +112,12 @@ public class MainActivity extends Activity {
     private void requestDevicePIN() {
         KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
         if (keyguardManager != null && keyguardManager.isKeyguardSecure()) {
-            Intent intent = keyguardManager.createConfirmDeviceCredentialIntent("Geräte-PIN erforderlich", "Bitte geben Sie Ihre Geräte-PIN ein, um den Kiosk-Modus zu beenden.");
+            Intent intent = keyguardManager.createConfirmDeviceCredentialIntent(getString(R.string.device_pin_required_title), getString(R.string.device_pin_required_description));
             if (intent != null) {
                 startActivityForResult(intent, DEVICE_PIN_REQUEST_CODE);
             }
         } else {
-            Toast.makeText(this, "Gerätesperre ist nicht eingerichtet. Der Kiosk-Modus kann nicht beendet werden.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.no_device_lock_available_message, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -134,9 +134,9 @@ public class MainActivity extends Activity {
                 break;
             case REQUEST_CODE_SETTINGS:
                 if (resultCode == Activity.RESULT_OK) {
-                    mMessage.setText("Einstellungen gespeichert.");
+                    mMessage.setText(R.string.settings_saved_message);
                 } else if (resultCode == Activity.RESULT_CANCELED) {
-                    mMessage.setText("Änderungen an den Einstellungen wurden verworfen.");
+                    mMessage.setText(R.string.settings_discarded_message);
                 } else if (resultCode == SettingsActivity.RESULT_NO_CHANGES) {
                     mMessage.setText("");
                 }
@@ -145,7 +145,7 @@ public class MainActivity extends Activity {
                 if (resultCode == RESULT_OK) {
                     openWebViewActivity();
                 } else {
-                    Toast.makeText(getApplicationContext(), "Authentifizierung fehlgeschlagen", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), R.string.authentification_failed_message, Toast.LENGTH_SHORT).show();
                 }
                 break;
             default:
