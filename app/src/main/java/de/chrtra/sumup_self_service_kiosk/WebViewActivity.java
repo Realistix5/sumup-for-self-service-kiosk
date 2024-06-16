@@ -191,7 +191,7 @@ public class WebViewActivity extends Activity {
     public void exitKioskMode() {
         KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
         if (keyguardManager != null && keyguardManager.isKeyguardSecure()) {
-            Intent intent = keyguardManager.createConfirmDeviceCredentialIntent(getString(R.string.device_pin_required_title), getString(R.string.device_pin_required_description));
+            Intent intent = keyguardManager.createConfirmDeviceCredentialIntent(getString(R.string.device_pin_required_title), getString(R.string.device_pin_required_end_description));
             if (intent != null) {
                 startActivityForResult(intent, DEVICE_PIN_REQUEST_CODE);
             }

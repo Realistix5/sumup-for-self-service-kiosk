@@ -112,7 +112,7 @@ public class MainActivity extends Activity {
     private void requestDevicePIN() {
         KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
         if (keyguardManager != null && keyguardManager.isKeyguardSecure()) {
-            Intent intent = keyguardManager.createConfirmDeviceCredentialIntent(getString(R.string.device_pin_required_title), getString(R.string.device_pin_required_description));
+            Intent intent = keyguardManager.createConfirmDeviceCredentialIntent(getString(R.string.device_pin_required_title), getString(R.string.device_pin_required_start_description));
             if (intent != null) {
                 startActivityForResult(intent, DEVICE_PIN_REQUEST_CODE);
             }

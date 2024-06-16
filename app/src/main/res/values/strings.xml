@@ -36,7 +36,8 @@
     <!-- Messages -->
     <string name="not_logged_in_message">Nicht eingeloggt.</string>
     <string name="device_pin_required_title">Geräte-PIN erforderlich</string>
-    <string name="device_pin_required_description">Bitte geben Sie Ihre Geräte-PIN ein, um den Kiosk-Modus zu beenden.</string>
+    <string name="device_pin_required_end_description">Bitte geben Sie Ihre Geräte-PIN ein, um den Kiosk-Modus zu beenden.</string>
+    <string name="device_pin_required_start_description">Bitte geben Sie Ihre Geräte-PIN ein, um den Kiosk-Modus zu starten.</string>
     <string name="no_device_lock_available_message">Gerätesperre ist nicht eingerichtet. Der Kiosk-Modus kann nicht beendet werden.</string>
     <string name="authentification_failed_message">Authentifizierung fehlgeschlagen</string>
     <string name="settings_saved_message">Einstellungen gespeichert.</string>
