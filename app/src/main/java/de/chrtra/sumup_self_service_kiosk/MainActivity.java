@@ -16,7 +16,10 @@ import android.widget.Toast;
 import com.sumup.merchant.reader.api.SumUpAPI;
 import com.sumup.merchant.reader.api.SumUpLogin;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class MainActivity extends Activity {
 
@@ -99,9 +102,21 @@ public class MainActivity extends Activity {
     private boolean areSettingsValid() {
         // Hier die Logik hinzufügen, um die erforderlichen Einstellungen zu überprüfen
         // Zum Beispiel:
-        String setting1 = sharedPreferences.getString("start_url", "");
-        String setting2 = sharedPreferences.getString("success_url", "");
-        return !setting1.isEmpty() && !setting2.isEmpty();
+        Set<String> mandatory_settings = Set.of(
+                "custom_url_schema",
+                "custom_url_host",
+                "start_url",
+                "success_url",
+                "error_url",
+                "currency"
+        );
+        for (String setting_id : mandatory_settings) {
+            String setting = sharedPreferences.getString(setting_id, "");
+            if (setting.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void openLoginActivity() {
