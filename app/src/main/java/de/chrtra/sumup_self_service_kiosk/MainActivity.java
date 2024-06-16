@@ -24,6 +24,7 @@ public class MainActivity extends Activity {
     private static final int REQUEST_CODE_WEBVIEW = 2;
     private static final int REQUEST_CODE_CARD_READER_PAGE = 4;
     private static final int REQUEST_CODE_SETTINGS = 11;
+    private static final int DEVICE_PIN_REQUEST_CODE = 101; // Request-Code für die Geräte-PIN-Abfrage
 
     private SharedPreferences sharedPreferences;
 
@@ -113,7 +114,7 @@ public class MainActivity extends Activity {
         if (keyguardManager != null && keyguardManager.isKeyguardSecure()) {
             Intent intent = keyguardManager.createConfirmDeviceCredentialIntent("Geräte-PIN erforderlich", "Bitte geben Sie Ihre Geräte-PIN ein, um den Kiosk-Modus zu beenden.");
             if (intent != null) {
-                openWebViewActivity();
+                startActivityForResult(intent, DEVICE_PIN_REQUEST_CODE);
             }
         } else {
             Toast.makeText(this, "Gerätesperre ist nicht eingerichtet. Der Kiosk-Modus kann nicht beendet werden.", Toast.LENGTH_LONG).show();
@@ -138,6 +139,13 @@ public class MainActivity extends Activity {
                     mMessage.setText("Änderungen an den Einstellungen wurden verworfen.");
                 } else if (resultCode == SettingsActivity.RESULT_NO_CHANGES) {
                     mMessage.setText("");
+                }
+                break;
+            case DEVICE_PIN_REQUEST_CODE:
+                if (resultCode == RESULT_OK) {
+                    openWebViewActivity();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Authentifizierung fehlgeschlagen", Toast.LENGTH_SHORT).show();
                 }
                 break;
             default:
