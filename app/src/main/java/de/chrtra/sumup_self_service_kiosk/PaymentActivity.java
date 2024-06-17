@@ -17,13 +17,12 @@ import java.util.Objects;
 public class PaymentActivity extends Activity {
 
     private Map<String, String> queryParams;
-    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
 
         queryParams = new HashMap<>();
 
@@ -86,7 +85,7 @@ public class PaymentActivity extends Activity {
                 // Add booleans
                 // Tip on card reader
                 if (queryParams.containsKey("tip_on_card_reader")) {
-                    if (queryParams.get("tip_on_card_reader").equals("1")){
+                    if (Objects.equals(queryParams.get("tip_on_card_reader"), "1")){
                         paymentBuilder.tipOnCardReader();
                     }
                 } else {
@@ -96,7 +95,7 @@ public class PaymentActivity extends Activity {
                 }
                 // Skip failed screen
                 if (queryParams.containsKey("skip_failed_screen")) {
-                    if (queryParams.get("skip_failed_screen").equals("1")){
+                    if (Objects.equals(queryParams.get("skip_failed_screen"), "1")){
                         paymentBuilder.skipFailedScreen();
                     }
                 } else {
@@ -106,7 +105,7 @@ public class PaymentActivity extends Activity {
                 }
                 // Skip success screen
                 if (queryParams.containsKey("skip_success_screen")) {
-                    if (queryParams.get("skip_success_screen").equals("1")){
+                    if (Objects.equals(queryParams.get("skip_success_screen"), "1")){
                         paymentBuilder.skipSuccessScreen();
                     }
                 } else {
