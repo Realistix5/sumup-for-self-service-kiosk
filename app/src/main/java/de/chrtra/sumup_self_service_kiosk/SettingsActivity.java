@@ -2,7 +2,6 @@ package de.chrtra.sumup_self_service_kiosk;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
@@ -21,7 +20,6 @@ import java.util.List;
 
 public class SettingsActivity extends Activity {
     private TableLayout tableLayout;
-    private Button saveButton;
     private SharedPreferences sharedPreferences;
     private boolean hasUnsavedChanges = false;
     public static final int RESULT_NO_CHANGES = 33;
@@ -50,7 +48,7 @@ public class SettingsActivity extends Activity {
         }
     }
 
-    private List<SettingGroup> settingGroups = new ArrayList<>();
+    private final List<SettingGroup> settingGroups = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +56,7 @@ public class SettingsActivity extends Activity {
         setContentView(R.layout.activity_settings);
 
         tableLayout = findViewById(R.id.tableLayout);
-        saveButton = findViewById(R.id.saveButton);
+        Button saveButton = findViewById(R.id.saveButton);
         sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
 
         // Füge die Einstellungsgruppen zur Liste hinzu

@@ -16,8 +16,6 @@ import android.widget.Toast;
 import com.sumup.merchant.reader.api.SumUpAPI;
 import com.sumup.merchant.reader.api.SumUpLogin;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -52,49 +50,40 @@ public class MainActivity extends Activity {
 
         mMessage.setText(R.string.welcome_message);
 
-        Button login = (Button) findViewById(R.id.button_login);
-        login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Please go to https://me.sumup.com/developers to get your Affiliate Key by entering the application ID of your app. (e.g. com.sumup.sdksampleapp)
-                SumUpLogin sumupLogin = SumUpLogin.builder(sharedPreferences.getString("affiliate_key", "")).build();
-                SumUpAPI.openLoginActivity(MainActivity.this, sumupLogin, REQUEST_CODE_LOGIN);
+        Button login = findViewById(R.id.button_login);
+        login.setOnClickListener(v -> {
+            // Please go to https://me.sumup.com/developers to get your Affiliate Key by entering the application ID of your app. (e.g. com.sumup.sdksampleapp)
+            SumUpLogin sumupLogin = SumUpLogin.builder(sharedPreferences.getString("affiliate_key", "")).build();
+            SumUpAPI.openLoginActivity(MainActivity.this, sumupLogin, REQUEST_CODE_LOGIN);
+        });
+
+        Button logMerchant = findViewById(R.id.button_log_merchant);
+        logMerchant.setOnClickListener(view -> {
+            if (!SumUpAPI.isLoggedIn()) {
+                mMessage.setText(R.string.not_logged_in_message);
+            } else {
+                mMessage.setText(
+                        String.format("Currency: %s, Merchant Code: %s", Objects.requireNonNull(SumUpAPI.getCurrentMerchant()).getCurrency().getIsoCode(),
+                                SumUpAPI.getCurrentMerchant().getMerchantCode()));
             }
         });
 
-        Button logMerchant = (Button) findViewById(R.id.button_log_merchant);
-        logMerchant.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!SumUpAPI.isLoggedIn()) {
-                    mMessage.setText(R.string.not_logged_in_message);
-                } else {
-                    mMessage.setText(
-                            String.format("Currency: %s, Merchant Code: %s", SumUpAPI.getCurrentMerchant().getCurrency().getIsoCode(),
-                                    SumUpAPI.getCurrentMerchant().getMerchantCode()));
-                }
-            }
-        });
-
-        Button cardReaderPage = (Button) findViewById(R.id.button_card_reader_page);
+        Button cardReaderPage = findViewById(R.id.button_card_reader_page);
         cardReaderPage.setOnClickListener(v -> SumUpAPI.openCardReaderPage(MainActivity.this, REQUEST_CODE_CARD_READER_PAGE));
 
-        Button btnLogout = (Button) findViewById(R.id.button_logout);
+        Button btnLogout = findViewById(R.id.button_logout);
         btnLogout.setOnClickListener(v -> SumUpAPI.logout());
 
-        Button openWebView = (Button) findViewById(R.id.btn_open_webview);
-        openWebView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (areSettingsValid()) {
-                    if (SumUpAPI.isLoggedIn()) {
-                        requestDevicePIN();
-                    } else {
-                        openLoginActivity();
-                    }
+        Button openWebView = findViewById(R.id.btn_open_webview);
+        openWebView.setOnClickListener(v -> {
+            if (areSettingsValid()) {
+                if (SumUpAPI.isLoggedIn()) {
+                    requestDevicePIN();
                 } else {
-                    Toast.makeText(MainActivity.this, R.string.settings_not_set_message, Toast.LENGTH_SHORT).show();
+                    openLoginActivity();
                 }
+            } else {
+                Toast.makeText(MainActivity.this, R.string.settings_not_set_message, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -143,6 +132,7 @@ public class MainActivity extends Activity {
             case REQUEST_CODE_CARD_READER_PAGE:
                 if (data != null) {
                     Bundle extra = data.getExtras();
+                    assert extra != null;
                     String message = extra.getString(SumUpAPI.Response.MESSAGE);
                     mMessage.setText(message);
                 }
@@ -174,7 +164,7 @@ public class MainActivity extends Activity {
     }
 
     private void findViews() {
-        mMessage = (TextView) findViewById(R.id.message);
+        mMessage = findViewById(R.id.message);
     }
 
     public void openSettingsActivity(View view) {
