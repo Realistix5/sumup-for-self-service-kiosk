@@ -69,7 +69,7 @@ public class PaymentActivity extends Activity {
 
                 // Add receiptSMS
                 if (queryParams.containsKey("receipt_sms")) {
-                    paymentBuilder.receiptEmail(queryParams.get("receipt_sms"));
+                    paymentBuilder.receiptSMS(queryParams.get("receipt_sms"));
                 }
 
                 // Add foreignTransactionId
