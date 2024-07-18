@@ -27,7 +27,7 @@ public class MainActivity extends Activity {
     private static final int REQUEST_CODE_SETTINGS = 11;
     private static final int DEVICE_PIN_REQUEST_CODE = 101; // Request-Code für die Geräte-PIN-Abfrage
 
-    private SharedPreferences sharedPreferences;
+    protected SharedPreferences sharedPreferences;
 
     private TextView mMessage;
 
@@ -88,7 +88,7 @@ public class MainActivity extends Activity {
         });
     }
 
-    private boolean areSettingsValid() {
+    protected boolean areSettingsValid() {
         // Hier die Logik hinzufügen, um die erforderlichen Einstellungen zu überprüfen
         // Zum Beispiel:
         Set<String> mandatory_settings = Set.of(
